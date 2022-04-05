@@ -31,12 +31,12 @@ def split_time(x):
 
 def format_time(x):
     if not x:
-        return "0d 0m 0s"
+        return "0d 0m"
     t = split_time(x)
     if t.days:
         return "%dd %dh %dm" % (t.days, t.hours, t.minutes)
-    if t.hours == 0 and t.minutes == 0:
-        return "%dh %dm %ds" % (t.hours, t.minutes, t.seconds)
+    #if t.hours == 0 and t.minutes == 0:
+    #    return "%dh %dm %ds" % (t.hours, t.minutes, t.seconds)
     return "%dh %dm" % (t.hours, t.minutes)
 
 
@@ -45,6 +45,7 @@ class Tunnit(object):
         self.status = False
         self.timer = None
         self.description = ""
+        self.stopped = None
 
     def toggle(self, description=None):
         if self.status:
@@ -59,13 +60,19 @@ class Tunnit(object):
 
     def get_formatted_time(self):
         if self.timer:
-            return format_time(datetime.now() - self.timer)
+            if not self.stopped:
+                t = datetime.now()
+            else:
+                t = self.stopped
+            return format_time(t - self.timer)
         return format_time(None)
 
     def reset_timer(self):
         self.timer = None
+        self.stopped = None
 
     def start(self, description=""):
+        self.reset_timer()
         self.status = True
         self.description = description
         self.timer = datetime.now()
@@ -78,6 +85,6 @@ class Tunnit(object):
             self.description = description
         self.status = False
         time_spent = self.get_formatted_time()
-        self.reset_timer()
+        self.stopped = datetime.now()
         logger.info("Working stopped: %s, %s" % (time_spent, description))
 

@@ -1,3 +1,7 @@
 *.pyc
 dist/
 build/
+Applications/
+Applications.*
+.eggs
+*.log
